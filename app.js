@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import yahooFinance from 'yahoo-finance2';
+import serverless from 'serverless-http';
 
 // =================================================================
 // HELPER FUNCTIONS
@@ -63,7 +64,6 @@ function formatDateToYMD(date) {
 // =================================================================
 
 const app = express();
-const PORT = 8080;
 
 app.use(cors());
 
@@ -190,9 +190,12 @@ app.get('/api/investment-data', async (req, res) => {
 
 
 // =================================================================
-// START THE SERVER
+// LAMBDA HANDLER EXPORT
 // =================================================================
 
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
-});
+// This is the correct, robust export pattern
+const lambda = serverless(app);
+
+export const handler = async (event, context) => {
+  return await lambda(event, context);
+};
